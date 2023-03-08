@@ -3240,7 +3240,7 @@ _ProxyHandler _proxyHandlerForUri(
       request.headers
           .forEach((name, value) => requestHeaders[name] = value.join(', '));
       final originRequest =
-          await _getUrl(client, redirectedUri ?? uri, headers: requestHeaders, requestMethod: requestMethod, body: body);
+          await _getUrl(client, redirectedUri ?? uri, headers: requestHeaders, requestMethod: requestMethod);
       host = originRequest.headers.value(HttpHeaders.hostHeader);
       if (requestMethod == "POST" && body != null) {
         originRequest.write(body);
