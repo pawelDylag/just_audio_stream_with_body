@@ -3240,8 +3240,11 @@ _ProxyHandler _proxyHandlerForUri(
       request.headers
           .forEach((name, value) => requestHeaders[name] = value.join(', '));
       final originRequest =
-          await _getUrl(client, redirectedUri ?? uri, headers: requestHeaders);
+          await _getUrl(client, redirectedUri ?? uri, headers: requestHeaders, requestMethod: requestMethod, body: body);
       host = originRequest.headers.value(HttpHeaders.hostHeader);
+      if (requestMethod == "POST" && body != null) {
+        originRequest.write(body);
+      }
       final originResponse = await originRequest.close();
       if (originResponse.redirects.isNotEmpty) {
         redirectedUri = originResponse.redirects.last.location;
@@ -3894,8 +3897,8 @@ enum PositionDiscontinuityReason {
 }
 
 Future<HttpClientRequest> _getUrl(HttpClient client, Uri uri,
-    {Map<String, String>? headers}) async {
-  final request = await client.getUrl(uri);
+    { String? requestMethod = "GET", Map<String, String>? headers}) async {
+  final request = await _getUrlWithMethod(uri, requestMethod, client);
   if (headers != null) {
     final host = request.headers.value(HttpHeaders.hostHeader);
     request.headers.clear();
@@ -3911,6 +3914,14 @@ Future<HttpClientRequest> _getUrl(HttpClient client, Uri uri,
   // Match ExoPlayer's native behavior
   request.maxRedirects = 20;
   return request;
+}
+
+Future<HttpClientRequest> _getUrlWithMethod(Uri uri, String? requestMethod, HttpClient client) {
+  if (requestMethod == "POST") {
+    return client.postUrl(uri);
+  } else {
+    return client.getUrl(uri);
+  }
 }
 
 HttpClient _createHttpClient({String? userAgent}) {
