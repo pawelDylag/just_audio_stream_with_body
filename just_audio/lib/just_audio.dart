@@ -684,7 +684,7 @@ class AudioPlayer {
   }) =>
       setAudioSource(
           AudioSource.uri(Uri.parse(url),
-              requestMethod: requestMethod, headers: headers),
+              requestMethod: requestMethod, headers: headers, body: body),
           initialPosition: initialPosition,
           preload: preload);
 
@@ -3300,7 +3300,7 @@ _ProxyHandler _proxyHandlerForUri(
       await request.response.close();
     } on HttpException {
       // We likely are dealing with a streaming protocol
-      if (uri.scheme == 'http') {
+      if (uri.scheme == 'http' || uri.scheme == 'https') {
         // Try parsing HTTP 0.9 response
         //request.response.headers.clear();
         final socket = await Socket.connect(uri.host, uri.port);
