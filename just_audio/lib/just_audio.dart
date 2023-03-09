@@ -1978,6 +1978,7 @@ class _ProxyHttpServer {
     final uri = source.uri;
     final requestMethod = source.requestMethod ?? "GET";
     final headers = <String, String>{};
+    final body = source.body;
     if (source.headers != null) {
       headers.addAll(source.headers!.cast<String, String>());
     }
@@ -1986,7 +1987,7 @@ class _ProxyHttpServer {
       uri,
       requestMethod,
       headers: headers,
-      body: source.body,
+      body: body,
       userAgent: source._player?._userAgent,
     );
     return uri.replace(
