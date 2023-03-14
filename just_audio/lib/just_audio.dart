@@ -3243,7 +3243,7 @@ _ProxyHandler _proxyHandlerForUri(
       final originRequest =
           await _getUrl(client, redirectedUri ?? uri, headers: requestHeaders, requestMethod: requestMethod);
       host = originRequest.headers.value(HttpHeaders.hostHeader);
-      print("JUST_AUDIO: method = $requestMethod, headers = $headers, body = $body")
+      print("JUST_AUDIO: method = $requestMethod, headers = $headers, body = $body");
       if (requestMethod == "POST" && body != null) {
         originRequest.write(body);
       }
