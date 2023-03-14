@@ -3906,7 +3906,9 @@ Future<HttpClientRequest> _getUrl(HttpClient client, Uri uri,
   if (headers != null) {
     final host = request.headers.value(HttpHeaders.hostHeader);
     request.headers.clear();
-    request.headers.set(HttpHeaders.contentLengthHeader, '0');
+    if (requestMethod != "POST") {
+      request.headers.set(HttpHeaders.contentLengthHeader, '0');
+    }
     headers.forEach((name, value) => request.headers.set(name, value));
     if (host != null) {
       request.headers.set(HttpHeaders.hostHeader, host);
