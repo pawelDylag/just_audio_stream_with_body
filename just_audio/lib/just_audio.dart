@@ -3245,9 +3245,11 @@ _ProxyHandler _proxyHandlerForUri(
       host = originRequest.headers.value(HttpHeaders.hostHeader);
       print("JUST_AUDIO: method = $requestMethod, headers = $headers, body = $body");
       if (requestMethod == "POST" && body != null) {
+        print("Writing body...");
         originRequest.write(body);
       }
       final originResponse = await originRequest.close();
+      print("ORIGIN RESPONSE: $originResponse");
       if (originResponse.redirects.isNotEmpty) {
         redirectedUri = originResponse.redirects.last.location;
       }
