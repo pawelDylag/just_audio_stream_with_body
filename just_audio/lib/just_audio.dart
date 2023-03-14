@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:audio_session/audio_session.dart';
 import 'package:crypto/crypto.dart';
@@ -3241,9 +3242,10 @@ _ProxyHandler _proxyHandlerForUri(
       request.headers
           .forEach((name, value) => requestHeaders[name] = value.join(', '));
       final originRequest =
-          await _getUrl(client, redirectedUri ?? uri, headers: requestHeaders, requestMethod: requestMethod);
+          await _getUrl(client, redirectedUri ?? uri, headers: requestHeaders, requestMethod: requestMethod, body: body);
       host = originRequest.headers.value(HttpHeaders.hostHeader);
       print("JUST_AUDIO: method = $requestMethod, headers = $headers, body = $body");
+
       if (requestMethod == "POST" && body != null) {
         print("Writing body...");
         originRequest.write(body);
@@ -3901,15 +3903,16 @@ enum PositionDiscontinuityReason {
 }
 
 Future<HttpClientRequest> _getUrl(HttpClient client, Uri uri,
-    { String? requestMethod = "GET", Map<String, String>? headers}) async {
+    { String? requestMethod = "GET", Map<String, String>? headers, String? body}) async {
   final request = await _getUrlWithMethod(uri, requestMethod, client);
   if (headers != null) {
     final host = request.headers.value(HttpHeaders.hostHeader);
     request.headers.clear();
-    if (requestMethod != "POST") {
-      request.headers.set(HttpHeaders.contentLengthHeader, '0');
-    }
+    request.headers.set(HttpHeaders.contentLengthHeader, _getContentLength(body));
     headers.forEach((name, value) => request.headers.set(name, value));
+    if (body != null) {
+      request.headers.set(HttpHeaders.contentTypeHeader, "text/plain; charset=utf-8");
+    }
     if (host != null) {
       request.headers.set(HttpHeaders.hostHeader, host);
     }
@@ -3927,6 +3930,14 @@ Future<HttpClientRequest> _getUrlWithMethod(Uri uri, String? requestMethod, Http
     return client.postUrl(uri);
   } else {
     return client.getUrl(uri);
+  }
+}
+
+int _getContentLength(String? body) {
+  if (body != null) {
+    return utf8.encode(body).length;
+  } else {
+    return 0;
   }
 }
 
