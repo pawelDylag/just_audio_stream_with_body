@@ -3910,9 +3910,6 @@ Future<HttpClientRequest> _getUrl(HttpClient client, Uri uri,
     request.headers.clear();
     request.headers.set(HttpHeaders.contentLengthHeader, _getContentLength(body));
     headers.forEach((name, value) => request.headers.set(name, value));
-    if (body != null) {
-      request.headers.set(HttpHeaders.contentTypeHeader, "text/plain; charset=utf-8");
-    }
     if (host != null) {
       request.headers.set(HttpHeaders.hostHeader, host);
     }
