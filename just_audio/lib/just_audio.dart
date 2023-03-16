@@ -3247,11 +3247,11 @@ _ProxyHandler _proxyHandlerForUri(
       print("JUST_AUDIO: method = $requestMethod, headers = $headers, body = $body");
 
       if (requestMethod == "POST" && body != null) {
-        print("Writing body...");
+        print("JUST_AUDIO: Writing body...");
         originRequest.write(body);
       }
       final originResponse = await originRequest.close();
-      print("ORIGIN RESPONSE: $originResponse");
+      print("JUST_AUDIO: ORIGIN RESPONSE: ${originResponse.headers}");
       if (originResponse.redirects.isNotEmpty) {
         redirectedUri = originResponse.redirects.last.location;
       }
@@ -3269,6 +3269,7 @@ _ProxyHandler _proxyHandlerForUri(
       if (headers != null && request.uri.path.toLowerCase().endsWith('.m3u8') ||
           ['application/x-mpegURL', 'application/vnd.apple.mpegurl']
               .contains(request.headers.value(HttpHeaders.contentTypeHeader))) {
+        print("JUST AUDIO: m3u8 or x-mpegURL or vnd.apple.mpegurl");
         // If this is an m3u8 file with headers, prepare the nested URIs.
         // TODO: Handle other playlist formats similarly?
         final m3u8 = await originResponse.transform(utf8.decoder).join();
@@ -3296,6 +3297,7 @@ _ProxyHandler _proxyHandlerForUri(
         }
         request.response.add(utf8.encode(m3u8));
       } else {
+        print("JUST AUDIO: other type");
         request.response.bufferOutput = false;
         var done = false;
         request.response.done.then((dynamic _) => done = true);
@@ -3308,6 +3310,7 @@ _ProxyHandler _proxyHandlerForUri(
       await request.response.flush();
       await request.response.close();
     } on HttpException {
+      print("JUST AUDIO: HttpException, We likely are dealing with a streaming protocol");
       // We likely are dealing with a streaming protocol
       if (uri.scheme == 'http' || uri.scheme == 'https') {
         // Try parsing HTTP 0.9 response
